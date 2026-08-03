@@ -1,0 +1,132 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "github-web contribution channel data",
+  "type": "object",
+  "required": ["source", "generated", "stale", "contributions", "profile", "pinned", "theme"],
+  "additionalProperties": true,
+  "properties": {
+    "source": {
+      "type": "object",
+      "required": ["provider", "user", "profile"],
+      "properties": {
+        "provider": { "const": "github" },
+        "user": { "type": "string", "minLength": 1 },
+        "profile": { "type": "string", "pattern": "^https://github\\.com/" }
+      }
+    },
+    "generated": { "type": "string", "format": "date-time" },
+    "stale": { "type": "boolean", "description": "true = last fetch failed; do not render" },
+    "note": { "type": "string" },
+
+    "contributions": {
+      "type": "object",
+      "required": ["range", "levelValues", "stats", "levels", "days"],
+      "properties": {
+        "range": {
+          "type": "object",
+          "required": ["from", "to"],
+          "properties": {
+            "from": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+            "to": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+          }
+        },
+        "levelValues": {
+          "type": "array",
+          "minItems": 5, "maxItems": 5,
+          "items": { "type": "integer", "minimum": 0 },
+          "description": "representative contribution count for each level 0-4"
+        },
+        "stats": {
+          "type": "object",
+          "required": ["total", "activeDays", "totalDays", "currentStreak", "longestStreak", "busiestDay"],
+          "properties": {
+            "total": { "type": "integer", "minimum": 0, "description": "GitHub's totalContributions for the window" },
+            "activeDays": { "type": "integer", "minimum": 0 },
+            "totalDays": { "type": "integer", "minimum": 1 },
+            "currentStreak": { "type": "integer", "minimum": 0 },
+            "longestStreak": { "type": "integer", "minimum": 0 },
+            "busiestDay": { "type": "integer", "minimum": 0 },
+            "averagePerWeek": { "type": "number", "minimum": 0 }
+          }
+        },
+        "levels": {
+          "type": "array",
+          "minItems": 53, "maxItems": 53,
+          "description": "levels[week][weekday]; week 0 oldest, weekday 0 Sunday",
+          "items": {
+            "type": "array",
+            "minItems": 7, "maxItems": 7,
+            "items": { "type": "integer", "minimum": 0, "maximum": 4 }
+          }
+        },
+        "days": {
+          "type": "array",
+          "minItems": 53, "maxItems": 53,
+          "description": "raw contribution counts, same shape as levels",
+          "items": {
+            "type": "array",
+            "minItems": 7, "maxItems": 7,
+            "items": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+
+    "profile": {
+      "type": "object",
+      "required": ["publicRepos", "pinnedCount"],
+      "properties": {
+        "publicRepos": { "type": "integer", "minimum": 0 },
+        "pinnedCount": { "type": "integer", "minimum": 0, "maximum": 6 },
+        "followers": { "type": "integer", "minimum": 0 }
+      }
+    },
+
+    "pinned": {
+      "type": "array",
+      "minItems": 1, "maxItems": 6,
+      "items": {
+        "type": "object",
+        "required": ["name", "url", "language", "languageColor"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "url": { "type": "string", "pattern": "^https://github\\.com/" },
+          "description": { "type": "string" },
+          "language": { "type": "string" },
+          "languageColor": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+          "stars": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+
+    "theme": {
+      "type": "object",
+      "required": ["empty", "levels", "cell"],
+      "properties": {
+        "empty": { "type": "string" },
+        "levels": {
+          "type": "array", "minItems": 4, "maxItems": 4,
+          "items": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" }
+        },
+        "cell": {
+          "type": "object",
+          "required": ["desktop", "mobile"],
+          "properties": {
+            "desktop": { "$ref": "#/definitions/cell" },
+            "mobile": { "$ref": "#/definitions/cell" }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "cell": {
+      "type": "object",
+      "required": ["size", "gap"],
+      "properties": {
+        "size": { "type": "integer", "minimum": 3, "maximum": 20 },
+        "gap": { "type": "integer", "minimum": 0, "maximum": 6 }
+      }
+    }
+  }
+}

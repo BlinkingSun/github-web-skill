@@ -1,0 +1,9 @@
+# Portable fallback. crontab -e, then add:
+#
+# cron runs with a nearly empty environment — it will NOT find node unless you
+# say so. Both lines below matter.
+PATH=/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin
+SHELL=/bin/bash
+
+# every 8 hours, at 00:00 / 08:00 / 16:00
+0 0,8,16 * * * cd $HOME/github-web && ./scripts/sync.sh --publish >> $HOME/github-web.log 2>&1

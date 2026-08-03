@@ -1,0 +1,38 @@
+# No server at all — let GitHub run it. Put this at .github/workflows/github-web.yml
+# in YOUR SITE'S repo, with the section already installed.
+#
+# Set one repository secret: GH_READ_TOKEN (a fine-grained PAT — see docs/API-SETUP.md).
+# The default GITHUB_TOKEN will NOT work: it cannot read your user contribution
+# calendar or your pinned items.
+name: Refresh GitHub channel
+
+on:
+  schedule:
+    - cron: '0 0,8,16 * * *'   # UTC. Cron here has no timezone option.
+  workflow_dispatch:            # lets you run it by hand from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+
+      - name: Sync
+        env:
+          GITHUB_USER: ${{ github.repository_owner }}
+          GITHUB_TOKEN: ${{ secrets.GH_READ_TOKEN }}
+          TARGETS: index.html
+        run: ./github-web/scripts/sync.sh
+
+      - name: Commit if changed
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --staged --quiet || git commit -m 'chore: refresh GitHub channel data'
+          git push

@@ -1,0 +1,22 @@
+# Linux server. Install as a USER unit (no root needed):
+#   mkdir -p ~/.config/systemd/user
+#   cp systemd.service ~/.config/systemd/user/github-web.service
+#   cp systemd.timer   ~/.config/systemd/user/github-web.timer
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now github-web.timer
+#   loginctl enable-linger $USER      # <- REQUIRED, or the timer stops at logout
+#
+# Watch it:  journalctl --user -u github-web -f
+# Test now:  systemctl --user start github-web.service
+[Unit]
+Description=Refresh the GitHub channel data and publish
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/github-web
+EnvironmentFile=%h/github-web/.env
+ExecStart=%h/github-web/scripts/sync.sh --publish
+# A failed fetch already leaves the page untouched; no need to retry hard.
+TimeoutStartSec=600

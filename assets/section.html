@@ -1,0 +1,76 @@
+<!-- ===== 01. Open source — GitHub channel =====
+     Data-driven. Every [data-gh] attribute is the integration surface for
+     scripts/ — do not remove them, and do not hand-edit the
+     values inside them. The inline styles on the hook containers and their
+     children are deliberate: render-github.mjs emits inline-styled markup, so
+     class-ifying these regions would be undone on the next sync. -->
+<div class="sechead sechead--os">
+  <h2 class="h2">01 — Open source</h2>
+  <span class="sechead__note">live from github</span>
+</div>
+
+<section class="chan" id="github">
+  <!-- The two counts here reuse the repos-public / repos-private hooks. The scalar
+     replace is global, so every element carrying a hook is filled — that is why
+     the same name can appear more than once on a page. -->
+<div class="chan__banner"><span>github — code</span><span><span data-gh="repos-public">0</span> public · <span data-gh="repos-private">0</span> private</span></div>
+
+  <div class="chan__head">
+    <a class="chan__mark ico" href="https://github.com/YOUR_GITHUB_USERNAME" aria-label="GitHub profile">
+      <svg viewBox="0 0 24 24" width="100%" height="100%" aria-hidden="true"><path fill="#fdf6ec" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+    </a>
+    <div class="chan__id">
+      <a class="chan__handle" href="https://github.com/YOUR_GITHUB_USERNAME">github.com/YOUR_GITHUB_USERNAME</a>
+      <div class="chan__strap">YOUR_TAGLINE — one line about what you build</div>
+      <div class="chan__countsm" data-gh="counts-mobile">0 repos · 0 private · 0 pinned</div>
+    </div>
+    <div class="chan__counts">
+      <!-- Repository split. The two bar widths are DERIVED by render-github.mjs
+           (public/(public+private)); never hand-edit a percentage or the bar
+           silently disagrees with its own legend. Colours are fixed by the
+           design system: public #39d353, private #f2743e. -->
+      <div class="repos">
+        <div class="repos__head">
+          <span class="count__l">repositories</span>
+          <span class="repos__n" data-gh="repos">0</span>
+        </div>
+        <div class="repos__bar" data-gh="repos-bar">
+          <span data-gh="repos-bar-public" style="width:50%;background:#39d353"></span>
+          <span data-gh="repos-bar-private" style="width:50%;background:#f2743e"></span>
+        </div>
+        <div class="repos__key">
+          <span><i style="background:#39d353"></i>public <b data-gh="repos-public">0</b></span>
+          <span><i style="background:#f2743e"></i>private <b data-gh="repos-private">0</b></span>
+        </div>
+      </div>
+      <div class="count"><div class="count__n" data-gh="pinned-count">0</div><div class="count__l">pinned</div></div>
+      <a class="btn-outline" href="https://github.com/YOUR_GITHUB_USERNAME">VIEW PROFILE ↗</a>
+    </div>
+  </div>
+
+  <div class="heat">
+    <div class="heat__chart">
+      <div class="heat__months" aria-hidden="true"><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span></div>
+      <div class="heat__grid heat__grid--desktop" data-gh="heatmap" data-gh-view="desktop" style="display:flex;gap:3px"></div>
+      <div class="heat__grid heat__grid--mobile" data-gh="heatmap" data-gh-view="mobile" style="display:flex;gap:1px"></div>
+    </div>
+    <div class="heat__side">
+      <div>
+        <div class="heat__total" data-gh="total">0</div>
+        <div class="count__l">contributions · 12 mo</div>
+      </div>
+      <div class="legend" aria-hidden="true"><span>less</span><i style="background:rgba(253,246,236,.07)"></i><i style="background:#0e4429"></i><i style="background:#006d32"></i><i style="background:#26a641"></i><i style="background:#39d353"></i><span>more</span></div>
+    </div>
+  </div>
+
+  <div class="statstrip" data-gh="stats">
+    <div class="stat"><div class="stat__n" data-gh="stat-currentStreak">0 days</div><div class="count__l">current streak</div></div>
+    <div class="stat"><div class="stat__n" data-gh="stat-longestStreak">0 days</div><div class="count__l">longest streak</div></div>
+    <div class="stat stat--wide"><div class="stat__n" data-gh="stat-busiestDay">0</div><div class="count__l">busiest day</div></div>
+    <div class="stat stat--wide"><div class="stat__n" data-gh="stat-activeDays">0 / 0</div><div class="count__l">days with commits</div></div>
+  </div>
+
+  <div class="cards cards--desktop" data-gh="pinned" data-gh-view="desktop" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(253,246,236,.14)"></div>
+  <div class="cards cards--mobile" data-gh="pinned" data-gh-view="mobile" style="display:grid;grid-template-columns:1fr;gap:1px;background:rgba(253,246,236,.14)"></div>
+</section>
+

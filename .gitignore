@@ -1,0 +1,6 @@
+# Fetched data is per-user and regenerated on every run. Never committed here;
+# in YOUR site repo you SHOULD commit data/ so the last-good copy survives a
+# failed fetch (that is what makes fail-closed work).
+/data/
+.env
+node_modules/

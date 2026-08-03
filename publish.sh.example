@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Copy to publish.sh, chmod +x, and edit. sync.sh --publish runs this AFTER a
+# successful fetch+validate+render, so anything here can assume the page is good.
+#
+# Guard rail worth keeping: refuse to commit if the sync touched anything it
+# should not have. A render bug that rewrites your whole page is caught here.
+set -euo pipefail
+cd "$(dirname "$0")"
+
+SITE_REPO="${SITE_REPO:?set SITE_REPO to your site's git working copy}"
+cd "$SITE_REPO"
+
+CHANGED="$(git diff --name-only)"
+UNEXPECTED="$(echo "$CHANGED" | grep -v -E '^(index\.html|.*\.html)$' || true)"
+if [ -n "$UNEXPECTED" ]; then
+  echo "refusing to publish — sync touched unexpected files:" >&2
+  echo "$UNEXPECTED" >&2
+  exit 1
+fi
+[ -z "$CHANGED" ] && { echo "no change"; exit 0; }
+
+git add -A
+git commit -m "chore: refresh GitHub channel data"
+git push
+
+# --- then whatever deploys your site, e.g. one of: ---
+# npx wrangler pages deploy . --project-name=YOUR_PROJECT
+# rsync -az --delete ./ user@host:/var/www/site/
+# (nothing at all, if your host builds from the git push)

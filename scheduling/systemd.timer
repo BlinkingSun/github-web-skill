@@ -1,0 +1,12 @@
+[Unit]
+Description=Run github-web every 8 hours
+
+[Timer]
+# 00:00, 08:00, 16:00 local. Persistent=true runs a missed slot once on the next
+# boot, which is what you want on a machine that is not always on.
+OnCalendar=*-*-* 00,08,16:00:00
+Persistent=true
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target

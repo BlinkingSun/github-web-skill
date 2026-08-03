@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- macOS server. Install:
+       cp launchd.plist ~/Library/LaunchAgents/com.example.github-web.plist
+       # edit the three PATH_TO placeholders first
+       launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.example.github-web.plist
+       launchctl print     gui/$(id -u)/com.example.github-web | grep '"Hour"'
+     Reload after any edit: launchctl bootout gui/$(id -u)/com.example.github-web, then bootstrap again.
+
+     Two things that will cost you an evening if you skip them:
+       - bash -lc, so the login profile supplies PATH. Without it launchd cannot find node.
+       - The login Keychain is UNUSABLE here. A non-interactive launchd session gets
+         "User interaction is not allowed" (error -25308). Credentials must come from
+         the .env file instead. See docs/API-SETUP.md.
+-->
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.example.github-web</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string><string>-lc</string>
+    <string>PATH_TO/github-web/scripts/sync.sh --publish</string>
+  </array>
+
+  <!-- Every 8 hours. StartCalendarInterval takes an ARRAY of dicts for multiple
+       times; a single dict is one time per day. launchd collapses firings missed
+       while asleep into ONE run on wake, not one per missed slot. -->
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>0</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>0</integer></dict>
+  </array>
+
+  <key>StandardOutPath</key><string>PATH_TO/Library/Logs/github-web.log</string>
+  <key>StandardErrorPath</key><string>PATH_TO/Library/Logs/github-web.log</string>
+  <key>ProcessType</key><string>Background</string>
+</dict></plist>
