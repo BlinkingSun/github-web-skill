@@ -123,13 +123,9 @@ function buildMatrix(weeks) {
  * dropped here.
  */
 function flatten(weeks) {
-  const todayUTC = new Date().toISOString().slice(0, 10);
   const out = [];
   for (const w of weeks) {
-    for (const d of w.contributionDays) {
-      if (d.date >= todayUTC) continue;
-      out.push(d.contributionCount);
-    }
+    for (const d of w.contributionDays) out.push(d.contributionCount);
   }
   return out;
 }
@@ -141,8 +137,15 @@ function computeStats(flat) {
     if (v > 0) { run++; active++; if (run > longest) longest = run; } else run = 0;
     if (v > busiest) busiest = v;
   }
+  /* Current streak. The in-progress day cuts BOTH ways:
+       - a ZERO today must not break the streak (the day is not over)
+       - a NON-ZERO today must COUNT, or the number reads one short of the
+         heatmap beside it — the chart shows 10 squares, the counter says 9.
+     Dropping today wholesale only fixed the first case. */
+  let i = flat.length - 1;
+  if (i >= 0 && flat[i] === 0) i--;   // today hasn't happened yet; not a break
   let current = 0;
-  for (let i = flat.length - 1; i >= 0; i--) { if (flat[i] > 0) current++; else break; }
+  for (; i >= 0; i--) { if (flat[i] > 0) current++; else break; }
   return {
     total,
     activeDays: active,

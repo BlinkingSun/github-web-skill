@@ -187,6 +187,11 @@ for (const file of targets) {
     'repos-public': String(d.profile.publicRepos),
     'repos-private': String(d.profile.privateRepos ?? 0),
     'pinned-count': String(d.profile.pinnedCount),
+    // The mobile one-liner under the handle. It carries a data-gh hook, so if it
+    // is not in this map it silently keeps whatever the template shipped while
+    // every counter around it updates.
+    'counts-mobile': `${d.profile.totalRepos ?? d.profile.publicRepos} repos · `
+      + `${d.profile.privateRepos ?? 0} private · ${d.profile.pinnedCount} pinned`,
   };
   // repository split bar — widths are derived, never authored by hand
   {
@@ -202,6 +207,25 @@ for (const file of targets) {
     const re = new RegExp(`(<(\\w+)[^>]*data-gh="${tag}"[^>]*>)[^<]*(</\\2>)`, 'g');
     if (re.test(html)) report.written.push(`[data-gh="${tag}"]`);
     html = html.replace(re, (_m, open, _t, close) => open + value + close);
+  }
+
+  /* Every data-gh hook in the page must be written by something above. A hook
+     nobody writes is the worst failure mode here: it shows whatever the template
+     shipped while every counter around it updates, and nothing reports it. This
+     is how [data-gh="counts-mobile"] sat stale reading "19 repos" beside a bar
+     that said 20 — found by a human, not by the tooling. */
+  {
+    const handled = new Set([...Object.keys(scalars),
+      'heatmap', 'pinned', 'pushes', 'total', 'stats',
+      'repos-bar', 'repos-bar-public', 'repos-bar-private']);
+    const present = new Set([...html.matchAll(/data-gh="([a-zA-Z-]+)"/g)].map((m) => m[1]));
+    const orphaned = [...present].filter((h) => !handled.has(h));
+    if (orphaned.length) {
+      console.error(`FATAL: ${file} — hooks present but never written: `
+        + orphaned.map((h) => `[data-gh="${h}"]`).join(', '));
+      console.error('Either render them or remove them; a stale hook is invisible.');
+      process.exit(1);
+    }
   }
 
   if (absent.length || report.missing.length) {
