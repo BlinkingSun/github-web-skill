@@ -41,12 +41,14 @@ own, or GitHub Actions for free — the package ships templates for both.
 | Busiest day, days with commits | derived |
 | Repository split bar | public vs private; both widths derived from the counts, never authored |
 | Pinned repo cards | the six pinned on your profile, with language dot + description |
-| Star and fork counts | sized to match the repo name; a zero renders nothing at all |
+| Star and fork counts | on **both** breakpoints, sized to the repo name beside them; a zero renders nothing at all |
 | Achievement badges *(optional)* | your own image, per repo — see [Achievements](#achievements) |
 | Recent pushes *(optional)* | last three repos by push time, with relative age. Private ones are shown but not linked — the URL 404s for visitors |
 
 Desktop and mobile variants are both supported (`data-gh-view="desktop"` / `"mobile"`);
-a page can carry either or both.
+a page can carry either or both. The mobile card puts its counters on the *language* row
+rather than the name row — repo names run long enough to wrap on a phone-width card and
+would shove a right-aligned count around.
 
 ---
 

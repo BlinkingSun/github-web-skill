@@ -104,22 +104,20 @@ function heatmap(levels, theme, view) {
    mark is the Octicons repo-forked path inlined (Octicons, MIT) — `script-src
    'none'` bans <script>, not <svg>, and an inline glyph costs no request.
    A zero renders nothing at all: an unstarred repo shows a bare name, not "0". */
-const FORK_SVG =
-  `<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="rgba(253,246,236,.75)" ` +
+const forkSvg = (px) =>
+  `<svg viewBox="0 0 16 16" width="${px}" height="${px}" aria-hidden="true" fill="rgba(253,246,236,.75)" ` +
   `style="display:block;flex:none"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path></svg>`;
 
-function counters(r) {
+function counters(r, fs, ico) {
+  const type = `font:600 ${fs}px 'JetBrains Mono',monospace;color:#fdf6ec`;
   const out = [];
   if (r.stars)
     out.push(
-      `<span style="display:flex;align-items:center;gap:5px;font:600 14px 'JetBrains Mono',monospace;color:#fdf6ec">` +
+      `<span style="display:flex;align-items:center;gap:5px;${type}">` +
       `<span style="font-size:1.45em;line-height:1;color:#fbbf4c">\u2605</span>${r.stars}</span>`
     );
   if (r.forks)
-    out.push(
-      `<span style="display:flex;align-items:center;gap:5px;font:600 14px 'JetBrains Mono',monospace;color:#fdf6ec">` +
-      `${FORK_SVG}${r.forks}</span>`
-    );
+    out.push(`<span style="display:flex;align-items:center;gap:5px;${type}">${forkSvg(ico)}${r.forks}</span>`);
   return out.join('');
 }
 
@@ -140,7 +138,7 @@ function cardDesktop(r) {
     `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px">` +
     `<span style="font:600 14px 'JetBrains Mono',monospace;color:#fdf6ec">${esc(r.name)}</span>` +
     `<span style="display:flex;align-items:center;flex:none;gap:11px">` +
-    achievement(r, 22) + counters(r) +
+    achievement(r, 22) + counters(r, 14, 15) +
     `</span></div>` +
     `<p style="margin:0;flex:1;font:400 12.5px/1.55 Archivo,sans-serif;color:rgba(253,246,236,.55);text-wrap:pretty">${esc(r.description)}</p>` +
     `<div style="display:flex;align-items:center;gap:7px;font:500 10.5px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(253,246,236,.45)">` +
@@ -157,13 +155,19 @@ function nameWithBadge(r) {
   return b ? `<span style="display:flex;align-items:center;gap:7px">${name}${b}</span>` : name;
 }
 
+/* Counters ride the LANGUAGE row on mobile, not the name row: repo names run long
+   enough to wrap on a ~390px card and would shove a right-aligned count around,
+   while the language row is two short words with space to spare. */
 function cardMobile(r) {
+  const c = counters(r, 12.5, 13);
   return (
     `<a href="${r.url}" style="display:flex;flex-direction:column;gap:6px;padding:13px 18px;background:#0b090d;text-decoration:none">` +
     nameWithBadge(r) +
+    `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">` +
     `<div style="display:flex;align-items:center;gap:7px;font:500 9.5px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(253,246,236,.45)">` +
     `<span style="width:7px;height:7px;border-radius:50%;background:${r.languageColor}"></span>${esc(r.language)}</div>` +
-    `</a>`
+    (c ? `<span style="display:flex;align-items:center;flex:none;gap:9px">${c}</span>` : '') +
+    `</div></a>`
   );
 }
 
