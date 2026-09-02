@@ -1,13 +1,16 @@
 # github-web
 
-A live GitHub channel for your website — contribution heatmap, streak and activity stats,
-a public/private repository split bar, and your pinned repo cards.
+**Put your GitHub stats on your own website, and let your coding agent keep them current on
+a schedule.** Contribution heatmap, streaks and activity stats, a public/private repository
+split bar, and your pinned repo cards with live star and fork counts.
 
 ![The section, rendered](docs/screenshot.png)
 
-Packaged as a **Claude Code skill**: `/github-web` walks you through GitHub API access,
-installs the section into your page, and sets up the automatic refresh on whatever machine
-you have. It also works fine as a plain set of scripts — see [Without Claude](#without-claude).
+Packaged as an **agent skill** — a `SKILL.md` your agent reads and follows. `/github-web`
+walks you through GitHub API access, installs the section into your page, and sets up the
+automatic refresh on whatever machine you have. Works with Claude Code, Cursor, the Grok
+CLI, or anything else that can read a skill file and run a shell. It is also a plain set of
+scripts — see [Without an agent](#without-an-agent).
 
 ---
 
@@ -38,6 +41,8 @@ own, or GitHub Actions for free — the package ships templates for both.
 | Busiest day, days with commits | derived |
 | Repository split bar | public vs private; both widths derived from the counts, never authored |
 | Pinned repo cards | the six pinned on your profile, with language dot + description |
+| Star and fork counts | sized to match the repo name; a zero renders nothing at all |
+| Achievement badges *(optional)* | your own image, per repo — see [Achievements](#achievements) |
 | Recent pushes *(optional)* | last three repos by push time, with relative age. Private ones are shown but not linked — the URL 404s for visitors |
 
 Desktop and mobile variants are both supported (`data-gh-view="desktop"` / `"mobile"`);
@@ -47,20 +52,24 @@ a page can carry either or both.
 
 ## Install
 
-### As a Claude Code skill
+### As an agent skill
 
 ```bash
-git clone https://github.com/BlinkingSun/claude-github-web-skill.git \
+git clone https://github.com/BlinkingSun/github-web-skill.git \
   ~/.claude/skills/github-web
 ```
 
 Then run `/github-web` and answer the questions. It will ask where your site is, how it
 publishes, and which machine is always on, then do the rest with you.
 
-### Without Claude
+Other agents keep their skills elsewhere — Cursor and the Grok CLI can both be pointed at
+the same directory. The skill itself is plain Markdown and shell; nothing in it is
+Claude-specific.
+
+### Without an agent
 
 ```bash
-git clone https://github.com/BlinkingSun/claude-github-web-skill.git github-web
+git clone https://github.com/BlinkingSun/github-web-skill.git github-web
 cd github-web
 
 # 1. paste assets/section.html into your page, assets/section.css into your stylesheet
@@ -78,6 +87,28 @@ way.
 
 ---
 
+## Achievements
+
+GitHub's API exposes profile achievements **nowhere** — they are account-level trophies,
+not repository fields — and their artwork is not ours to redistribute. So badges are opt-in
+and you supply the image.
+
+Create `data/achievements.json`, keyed by repository name:
+
+```json
+{
+  "my-repo": { "src": "/assets/achievements/starstruck.png", "label": "Starstruck" }
+}
+```
+
+`src` is used verbatim as the `<img src>`, so host the file with your site. The badge is
+drawn at 22px on desktop cards and 18px on mobile, circular. No file means no badges, which
+is the default.
+
+See [reference/achievements.example.json](reference/achievements.example.json).
+
+---
+
 ## Requirements
 
 - **Node 18+** (uses the built-in `fetch`)
@@ -87,7 +118,8 @@ way.
 
 If your site sets a `Content-Security-Policy`, the renderer emits inline-styled markup, so
 you need `style-src ... 'unsafe-inline'` or a nonce. Nothing else needs changing — in
-particular `script-src 'none'` is fine, which is the whole point.
+particular `script-src 'none'` is fine, which is the whole point. The fork glyph is an
+inline `<svg>` for the same reason.
 
 ---
 
@@ -137,7 +169,8 @@ scripts/sync.sh              fetch -> validate -> render -> (publish)
 publish.sh.example           your deploy step; copy and edit
 scheduling/                  launchd, systemd, cron, Task Scheduler, GitHub Actions
 schema/                      JSON Schema for the data file
-reference/                   a sample data file, so you can render before you have a token
+reference/                   sample data + an achievements example, so you can render
+                             before you have a token
 docs/                        API setup, troubleshooting
 ```
 
@@ -154,9 +187,17 @@ found in production, including:
 - the streak counting the in-progress UTC day, reporting `0` while a streak was running
 - a missing data file producing an `ENOENT` stack trace instead of telling you to run the
   fetch first
+- card counters rendered at 10.5px and 40% opacity, which is a number nobody reads — stars
+  and forks now match the repo name they sit beside
+
+Companion skill: **[thingiverse-web](https://github.com/BlinkingSun/thingiverse-web-skill)**
+— the same idea for your Thingiverse designs, downloads and thumbnails.
 
 ---
 
 ## Licence
 
 MIT. See [LICENSE](LICENSE).
+
+The fork glyph is [Octicons](https://github.com/primer/octicons) (MIT, © GitHub Inc.),
+inlined as a path.

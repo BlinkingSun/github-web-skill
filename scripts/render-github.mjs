@@ -31,6 +31,16 @@ if (!targets.length) {
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const num = (n) => Number(n).toLocaleString('en-US');
 
+/* Optional: data/achievements.json maps a repo name to a badge image you host.
+   GitHub's API exposes profile achievements nowhere, and their artwork is not
+   ours to redistribute — so you point at your own file:
+
+     { "my-repo": { "src": "/assets/achievements/starstruck.png",
+                    "label": "Starstruck" } }
+
+   Absent file = no badges, which is the default. */
+let achievements = {};
+
 /** Find an element by attribute selector and return {start, innerStart, innerEnd, end}. */
 function locate(html, attrs) {
   const needle = attrs.map((a) => `[${a}]`).join('');
@@ -89,13 +99,46 @@ function heatmap(levels, theme, view) {
     .join('');
 }
 
+/* Star and fork counters, sized to the repo name they sit beside. The star is a
+   text glyph, oversized and amber so the shape lands before the number; the fork
+   mark is the Octicons repo-forked path inlined (Octicons, MIT) — `script-src
+   'none'` bans <script>, not <svg>, and an inline glyph costs no request.
+   A zero renders nothing at all: an unstarred repo shows a bare name, not "0". */
+const FORK_SVG =
+  `<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="rgba(253,246,236,.75)" ` +
+  `style="display:block;flex:none"><path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z"></path></svg>`;
+
+function counters(r) {
+  const out = [];
+  if (r.stars)
+    out.push(
+      `<span style="display:flex;align-items:center;gap:5px;font:600 14px 'JetBrains Mono',monospace;color:#fdf6ec">` +
+      `<span style="font-size:1.45em;line-height:1;color:#fbbf4c">\u2605</span>${r.stars}</span>`
+    );
+  if (r.forks)
+    out.push(
+      `<span style="display:flex;align-items:center;gap:5px;font:600 14px 'JetBrains Mono',monospace;color:#fdf6ec">` +
+      `${FORK_SVG}${r.forks}</span>`
+    );
+  return out.join('');
+}
+
+function achievement(r, px) {
+  const a = achievements[r.name];
+  if (!a || !a.src) return '';
+  const label = esc(a.label || 'achievement');
+  return `<img src="${esc(a.src)}" alt="${label} achievement" title="${label}" width="${px}" height="${px}" ` +
+    `style="display:block;flex:none;width:${px}px;height:${px}px;border-radius:50%">`;
+}
+
 function cardDesktop(r) {
   return (
     `<a href="${r.url}" style="display:flex;flex-direction:column;gap:8px;padding:16px 18px;background:#0b090d;text-decoration:none;transition:background .16s ease" style-hover="background:rgba(253,246,236,.055)">` +
-    `<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">` +
+    `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px">` +
     `<span style="font:600 14px 'JetBrains Mono',monospace;color:#fdf6ec">${esc(r.name)}</span>` +
-    `<span style="font:500 10.5px 'JetBrains Mono',monospace;color:rgba(253,246,236,.4)">${r.stars ? '★ ' + r.stars : ''}</span>` +
-    `</div>` +
+    `<span style="display:flex;align-items:center;flex:none;gap:11px">` +
+    achievement(r, 22) + counters(r) +
+    `</span></div>` +
     `<p style="margin:0;flex:1;font:400 12.5px/1.55 Archivo,sans-serif;color:rgba(253,246,236,.55);text-wrap:pretty">${esc(r.description)}</p>` +
     `<div style="display:flex;align-items:center;gap:7px;font:500 10.5px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(253,246,236,.45)">` +
     `<span style="width:8px;height:8px;border-radius:50%;background:${r.languageColor}"></span>${esc(r.language)}</div>` +
@@ -103,10 +146,18 @@ function cardDesktop(r) {
   );
 }
 
+/* Only a badged card gets the extra flex row — wrapping every card would rewrite
+   markup that gained nothing. */
+function nameWithBadge(r) {
+  const name = `<span style="font:600 12.5px 'JetBrains Mono',monospace;color:#fdf6ec">${esc(r.name)}</span>`;
+  const b = achievement(r, 18);
+  return b ? `<span style="display:flex;align-items:center;gap:7px">${name}${b}</span>` : name;
+}
+
 function cardMobile(r) {
   return (
     `<a href="${r.url}" style="display:flex;flex-direction:column;gap:6px;padding:13px 18px;background:#0b090d;text-decoration:none">` +
-    `<span style="font:600 12.5px 'JetBrains Mono',monospace;color:#fdf6ec">${esc(r.name)}</span>` +
+    nameWithBadge(r) +
     `<div style="display:flex;align-items:center;gap:7px;font:500 9.5px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:rgba(253,246,236,.45)">` +
     `<span style="width:7px;height:7px;border-radius:50%;background:${r.languageColor}"></span>${esc(r.language)}</div>` +
     `</a>`
@@ -128,6 +179,7 @@ function pushRow(r) {
 let d;
 try {
   d = JSON.parse(await readFile(DATA, 'utf8'));
+try { achievements = JSON.parse(await readFile(resolve(ROOT, 'data/achievements.json'), 'utf8')); } catch {}
 } catch (e) {
   if (e.code === 'ENOENT') {
     console.error('FATAL: No data file yet — run `node scripts/fetch-github.mjs` first.');

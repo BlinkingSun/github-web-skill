@@ -94,7 +94,8 @@
           "description": { "type": "string" },
           "language": { "type": "string" },
           "languageColor": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
-          "stars": { "type": "integer", "minimum": 0 }
+          "stars": { "type": "integer", "minimum": 0 },
+          "forks": { "type": "integer", "minimum": 0 }
         }
       }
     },

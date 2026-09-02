@@ -57,7 +57,7 @@ query($login:String!, $from:DateTime!, $to:DateTime!) {
     pinnedItems(first:6, types:REPOSITORY) {
       nodes {
         ... on Repository {
-          name url description stargazerCount
+          name url description stargazerCount forkCount
           primaryLanguage { name color }
         }
       }
@@ -179,6 +179,7 @@ async function main() {
     language: r.primaryLanguage?.name || 'Releases',
     languageColor: r.primaryLanguage?.color || '#fbbf4c',
     stars: r.stargazerCount || 0,
+    forks: r.forkCount || 0,
   }));
 
   /* Rendered at sync time, so it can drift up to a day between runs — the same

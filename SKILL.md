@@ -1,6 +1,6 @@
 ---
 name: github-web
-description: Add a live GitHub contribution section to a website — a 53×7 contribution heatmap, streak and activity stats, a public/private repository split bar, and pinned repository cards, all rendered from the real GitHub API into static HTML. Guides the user through GitHub API access, installing the section into their page, and setting up an automatic refresh on a server (launchd, systemd, cron, Task Scheduler or GitHub Actions). Use when the user types /github-web, or asks to put their GitHub activity, contribution graph, commit heatmap, streak, or pinned repos on their website.
+description: Add your GitHub stats to your own website and keep them current on a schedule — a 53×7 contribution heatmap, streak and activity stats, a public/private repository split bar, and pinned repository cards with live star and fork counts, all rendered from the real GitHub API into static HTML. Guides the user through GitHub API access, installing the section into their page, and setting up an automatic refresh on a server (launchd, systemd, cron, Task Scheduler or GitHub Actions). Use when the user types /github-web, or asks to put their GitHub activity, contribution graph, commit heatmap, streak, or pinned repos on their website.
 ---
 
 # github-web
@@ -25,6 +25,8 @@ marked-up regions in place.
 | Busiest day, days with commits | derived |
 | Repository split bar | public vs private, widths derived from the counts |
 | Pinned repo cards | the six pinned on the profile, with language dot and description |
+| Star and fork counts | on each card, sized to match the repo name. A zero renders nothing |
+| Achievement badges *(optional)* | a per-repo image the user hosts — see Phase 3 |
 | Recent pushes *(optional)* | last three repos by push time, with relative age |
 
 Two viewports are supported: `data-gh-view="desktop"` and `="mobile"`. A page may carry
@@ -122,6 +124,17 @@ If the total looks too low, it is almost always the profile setting above.
 4. Fonts: the section asks for `JetBrains Mono` and a sans stack. It degrades to the
    system monospace without them. If they want the exact look, have them self-host
    JetBrains Mono rather than adding a font CDN, which most CSPs block.
+5. **Achievement badges are optional and opt-in.** GitHub's API exposes profile
+   achievements nowhere — they are account-level trophies with no repository field — and
+   GitHub's own artwork is not redistributable. If the user wants one, they host the image
+   with their site and write `data/achievements.json`:
+
+   ```json
+   { "their-repo": { "src": "/assets/achievements/starstruck.png", "label": "Starstruck" } }
+   ```
+
+   `src` is used verbatim as the `<img src>`. No file means no badges — do not invent one,
+   and do not copy GitHub's badge art into their repo for them.
 
 **The rules to tell them, in these words:**
 

@@ -1001,7 +1001,8 @@
       "description": "Example description \u2014 replaced on your first sync.",
       "language": "Swift",
       "languageColor": "#F05138",
-      "stars": 0
+      "stars": 128,
+      "forks": 9
     },
     {
       "name": "sensor-firmware",
@@ -1009,7 +1010,8 @@
       "description": "Example description \u2014 replaced on your first sync.",
       "language": "Releases",
       "languageColor": "#fbbf4c",
-      "stars": 0
+      "stars": 34,
+      "forks": 3
     },
     {
       "name": "cli-toolkit",
@@ -1017,7 +1019,8 @@
       "description": "Example description \u2014 replaced on your first sync.",
       "language": "C++",
       "languageColor": "#f34b7d",
-      "stars": 0
+      "stars": 0,
+      "forks": 0
     },
     {
       "name": "dotfiles",
@@ -1025,7 +1028,8 @@
       "description": "Example description \u2014 replaced on your first sync.",
       "language": "Swift",
       "languageColor": "#F05138",
-      "stars": 0
+      "stars": 0,
+      "forks": 0
     },
     {
       "name": "image-pipeline",
@@ -1033,7 +1037,8 @@
       "description": "Example description \u2014 replaced on your first sync.",
       "language": "Shell",
       "languageColor": "#89e051",
-      "stars": 4
+      "stars": 0,
+      "forks": 0
     },
     {
       "name": "api-client",
@@ -1041,7 +1046,8 @@
       "description": "Example description \u2014 replaced on your first sync.",
       "language": "Shell",
       "languageColor": "#89e051",
-      "stars": 0
+      "stars": 0,
+      "forks": 0
     }
   ],
   "pushes": [
