@@ -102,8 +102,16 @@ Create `data/achievements.json`, keyed by repository name:
 ```
 
 `src` is used verbatim as the `<img src>`, so host the file with your site. The badge is
-drawn at 22px on desktop cards and 18px on mobile, circular. No file means no badges, which
-is the default.
+drawn at 22px on desktop cards and 18px on mobile. No file means no badges, which is the
+default.
+
+**The image is not masked** — no `border-radius` is applied, so whatever shape your PNG's
+alpha describes is the shape you get. That is deliberate: GitHub's tiered badges are not
+discs (the `×2` / `×3` pill overhangs the bottom-right), and a circular mask would slice
+that corner off. Crop the file the way you want it drawn.
+
+Bumping a tier? **Use a new filename.** Assets are usually cached hard, so overwriting the
+old file serves stale art to returning visitors until it expires.
 
 See [reference/achievements.example.json](reference/achievements.example.json).
 

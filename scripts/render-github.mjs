@@ -127,8 +127,11 @@ function achievement(r, px) {
   const a = achievements[r.name];
   if (!a || !a.src) return '';
   const label = esc(a.label || 'achievement');
+  // No border-radius: your PNG carries its own alpha, and a tiered GitHub badge is
+  // not a disc — the "×N" pill overhangs the bottom-right, and a 50% radius slices
+  // that corner off. Crop the image to the shape you want instead.
   return `<img src="${esc(a.src)}" alt="${label} achievement" title="${label}" width="${px}" height="${px}" ` +
-    `style="display:block;flex:none;width:${px}px;height:${px}px;border-radius:50%">`;
+    `style="display:block;flex:none;width:${px}px;height:${px}px">`;
 }
 
 function cardDesktop(r) {
