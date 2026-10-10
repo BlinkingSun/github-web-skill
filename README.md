@@ -36,6 +36,7 @@ own, or GitHub Actions for free — the package ships templates for both.
 | Element | Notes |
 |---|---|
 | 53×7 contribution heatmap | real daily counts, GitHub's own green ramp |
+| Month labels | derived from the data on every sync, each sized to its own week columns — never authored |
 | 12-month contribution total | includes private contributions if your profile allows it |
 | Current / longest streak | counted to the last **completed** UTC day, so it never reads 0 mid-day |
 | Busiest day, days with commits | derived |

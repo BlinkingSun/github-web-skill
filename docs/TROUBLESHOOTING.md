@@ -20,6 +20,29 @@ contributions that **are** being included.
 
 ---
 
+## The month labels don't line up with GitHub's graph
+
+Before this fix, `assets/section.html` shipped the month row as literal text (`Aug`…`Jul`).
+Those labels were right only on the day the template was drawn. The 53 columns under them
+move on every sync, so a few months later the strip read "Jul" over September's work.
+
+The month row is now a render target like everything else:
+
+```html
+<div class="heat__months" data-gh="months" aria-hidden="true"></div>
+```
+
+The renderer writes one span per month, sized to that month's week columns and computed
+from `contributions.range.to`.
+
+**Upgrading from an earlier copy:** add `data-gh="months"` to your existing month row.
+Until you do, the renderer exits with `FATAL: … .heat__months has no [data-gh="months"]
+hook` instead of publishing labels that never move. Also replace the two
+`.heat__months span:nth-child(odd|even)` width rules with the new `--w` rules in
+`assets/section.css`, desktop and mobile.
+
+---
+
 ## The heatmap is an empty strip, and nothing errored
 
 A week column lost its explicit `grid-template-columns`. Without it the implicit column

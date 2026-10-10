@@ -99,6 +99,34 @@ function heatmap(levels, theme, view) {
     .join('');
 }
 
+/* Month labels over the 53 week columns. Earlier versions shipped them as
+   literal text in section.html (Aug…Jul), so they were right only on the day
+   the template was drawn while the columns under them moved on every sync.
+   Derived from range.to instead: buildMatrix right-aligns, so the last column
+   is the week (Sunday first) holding range.to and each column before it is the
+   week before. A column belongs to the month its Sunday falls in. Each span
+   carries its column count (--w) and the column pitch (--pitch desktop,
+   --pitch-m mobile: cell size + gap from the theme), and section.css turns
+   those into a width. A
+   month that owns one column (the clipped first or last week) gets no name. */
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function monthLabels(range, cols, theme) {
+  const to = new Date(`${range.to}T00:00:00Z`);
+  if (Number.isNaN(to.getTime())) throw new Error(`bad contributions.range.to: ${range.to}`);
+  const lastSunday = Date.UTC(to.getUTCFullYear(), to.getUTCMonth(), to.getUTCDate() - to.getUTCDay());
+  const { size, gap } = theme.cell.desktop;
+  const mob = theme.cell.mobile;
+  const segs = [];
+  for (let k = 0; k < cols; k++) {
+    const m = new Date(lastSunday - (cols - 1 - k) * 7 * 864e5).getUTCMonth();
+    if (segs.length && segs[segs.length - 1].m === m) segs[segs.length - 1].w++;
+    else segs.push({ m, w: 1 });
+  }
+  return segs
+    .map(({ m, w }) => `<span style="--w:${w};--pitch:${size + gap}px;--pitch-m:${mob.size + mob.gap}px"${w < 3 ? ' class="heat__m--short"' : ''}>${w >= 2 ? MONTHS[m] : ''}</span>`)
+    .join('');
+}
+
 /* Star and fork counters, sized to the repo name they sit beside. The star is a
    text glyph, oversized and amber so the shape lands before the number; the fork
    mark is the Octicons repo-forked path inlined (Octicons, MIT) — `script-src
@@ -233,6 +261,17 @@ for (const file of targets) {
     html = replaceInner(html, ['data-gh="pushes"'], d.pushes.map(pushRow).join(''), report);
   }
 
+  // month labels over the heatmap. A month row WITHOUT the hook keeps whatever
+  // text the template shipped forever, so that is fatal, not skipped.
+  if (/class="heat__months"/.test(html) && !locate(html, ['data-gh="months"'])) {
+    console.error(`FATAL: ${file} — .heat__months has no [data-gh="months"] hook; its labels would never move.`);
+    console.error('Add data-gh="months" to the month row (see assets/section.html).');
+    process.exit(1);
+  }
+  if (locate(html, ['data-gh="months"'])) {
+    html = replaceInner(html, ['data-gh="months"'], monthLabels(d.contributions.range, d.contributions.levels.length, d.theme), report);
+  }
+
   // every [data-gh="total"] on the page (desktop headline + mobile inline)
   html = html.replace(/(<(\w+)[^>]*data-gh="total"[^>]*>)([\s\S]*?)(?=<span|<\/)/g, (_m, open) => open + num(s.total));
 
@@ -275,7 +314,7 @@ for (const file of targets) {
      that said 20 — found by a human, not by the tooling. */
   {
     const handled = new Set([...Object.keys(scalars),
-      'heatmap', 'pinned', 'pushes', 'total', 'stats',
+      'heatmap', 'pinned', 'pushes', 'months', 'total', 'stats',
       'repos-bar', 'repos-bar-public', 'repos-bar-private']);
     const present = new Set([...html.matchAll(/data-gh="([a-zA-Z-]+)"/g)].map((m) => m[1]));
     const orphaned = [...present].filter((h) => !handled.has(h));

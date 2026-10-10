@@ -78,8 +78,10 @@
 .heat__months{display:flex;gap:3px;margin-bottom:6px;
   font:500 9.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;
   color:rgba(253,246,236,.4);}
-.heat__months span:nth-child(odd){width:77px}
-.heat__months span:nth-child(even){width:61px}
+/* One span per month, written by render-github.mjs: --w = its week columns,
+   --pitch = cell size + gap. The span drops its trailing gap because the row's
+   gap supplies it. */
+.heat__months span{flex:none;width:calc(var(--w,4) * var(--pitch,16px) - 3px);white-space:nowrap;overflow:hidden}
 .heat__grid--desktop i{width:13px}
 .heat__grid--mobile{display:none !important}
 .heat__side{display:flex;flex-direction:column;gap:12px;align-items:flex-end;text-align:right}
@@ -103,7 +105,11 @@
   .btn-outline{flex:1;text-align:center;padding:12px}
   .heat{grid-template-columns:1fr;gap:14px;padding:16px var(--pad-x)}
   .heat__months{display:flex;gap:0;margin-bottom:5px;font-size:9px;letter-spacing:.04em}
-  .heat__months span, .heat__months span:nth-child(odd), .heat__months span:nth-child(even){width:auto;flex:1;min-width:0}
+  /* mobile cells are space-between: a month's share of the row is its share of the
+     53 columns. The min-width is the month's own columns, so on a phone too narrow
+     for the grid the label row overflows exactly as far as the grid does. */
+  .heat__months span{width:auto;flex:var(--w,4) 1 0;min-width:calc(var(--w,4) * var(--pitch-m,6px))}
+  .heat__months .heat__m--short{visibility:hidden}
   .heat__grid--desktop{display:none !important}
   .heat__grid--mobile{display:flex !important;justify-content:space-between}
   .heat__side{flex-direction:row;align-items:center;justify-content:space-between;gap:12px;text-align:left;width:100%}

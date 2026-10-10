@@ -20,6 +20,7 @@ marked-up regions in place.
 | Element | Data |
 |---|---|
 | Contribution heatmap | 53×7, real daily counts, GitHub's own green ramp |
+| Month labels | derived from the data, one per month, sized to its week columns |
 | Contribution total | last 12 months |
 | Current / longest streak | consecutive days ending at the last **completed** UTC day |
 | Busiest day, days with commits | derived |
